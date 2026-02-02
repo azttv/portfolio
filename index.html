@@ -1,0 +1,2228 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BalAZtro</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+        <style>
+            @font-face {
+                font-family: "Balatro";
+                src: url("./font.woff2") format("woff2");
+                font-weight: normal;
+                font-style: normal;
+                font-display: swap;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Balatro", monospace !important;
+            }
+
+            html,
+            body,
+            #root {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            body {
+                background: #162325;
+                image-rendering: pixelated;
+                image-rendering: -moz-crisp-edges;
+                image-rendering: crisp-edges;
+            }
+
+            #balatro-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 0;
+            }
+
+            .app-container {
+                position: relative;
+                width: 100%;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 1;
+            }
+
+            .logo-container {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 60px;
+            }
+
+            .main-logo {
+                width: 1000px;
+                height: auto;
+                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+                user-select: none;
+                pointer-events: none;
+                image-rendering: pixelated;
+            }
+
+            .ace-card {
+                position: absolute;
+                width: 200px;
+                height: auto;
+                cursor: grab;
+                transition: transform 0.1s ease-out;
+                transform-style: preserve-3d;
+                z-index: 10;
+                image-rendering: pixelated;
+            }
+
+            .ace-card:active {
+                cursor: grabbing;
+            }
+
+            .ace-card.hovering {
+                animation: cardFloat 2s ease-in-out infinite;
+            }
+
+            @keyframes cardFloat {
+                0%,
+                100% {
+                    transform: translateY(0px) rotateY(0deg) rotateX(0deg);
+                }
+                50% {
+                    transform: translateY(-10px) rotateY(5deg) rotateX(5deg);
+                }
+            }
+
+            .menu-container {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                position: fixed;
+                bottom: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .buttons-background {
+                position: relative;
+                display: flex;
+                gap: 16px;
+                padding: 16px 28px;
+            }
+
+            .buttons-background::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .buttons-background::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #2d3748;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            /* Pixelated button base style */
+            .pixel-btn {
+                position: relative;
+                font-family: "Balatro", monospace !important;
+                font-size: 24px;
+                padding: 18px 36px;
+                border: none;
+                cursor: pointer;
+                text-transform: uppercase;
+                font-weight: bold;
+                letter-spacing: 1px;
+                color: white;
+                text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+                background: transparent;
+                image-rendering: pixelated;
+                transition:
+                    transform 0.1s ease,
+                    filter 0.1s ease;
+            }
+
+            .pixel-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                clip-path: polygon(
+                    0 8px,
+                    4px 8px,
+                    4px 4px,
+                    8px 4px,
+                    8px 0,
+                    calc(100% - 8px) 0,
+                    calc(100% - 8px) 4px,
+                    calc(100% - 4px) 4px,
+                    calc(100% - 4px) 8px,
+                    100% 8px,
+                    100% calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 4px),
+                    calc(100% - 8px) calc(100% - 4px),
+                    calc(100% - 8px) 100%,
+                    8px 100%,
+                    8px calc(100% - 4px),
+                    4px calc(100% - 4px),
+                    4px calc(100% - 8px),
+                    0 calc(100% - 8px)
+                );
+            }
+
+            .pixel-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -4px;
+                height: 100%;
+                z-index: -2;
+                clip-path: polygon(
+                    0 8px,
+                    4px 8px,
+                    4px 4px,
+                    8px 4px,
+                    8px 0,
+                    calc(100% - 8px) 0,
+                    calc(100% - 8px) 4px,
+                    calc(100% - 4px) 4px,
+                    calc(100% - 4px) 8px,
+                    100% 8px,
+                    100% calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 4px),
+                    calc(100% - 8px) calc(100% - 4px),
+                    calc(100% - 8px) 100%,
+                    8px 100%,
+                    8px calc(100% - 4px),
+                    4px calc(100% - 4px),
+                    4px calc(100% - 8px),
+                    0 calc(100% - 8px)
+                );
+            }
+
+            .pixel-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .pixel-btn:active {
+                transform: translateY(2px);
+            }
+
+            .btn-play::before {
+                background: #3b82f6;
+            }
+            .btn-play::after {
+                background: #1e40af;
+            }
+
+            .btn-options::before {
+                background: #f97316;
+            }
+            .btn-options::after {
+                background: #c2410c;
+            }
+
+            .btn-quit::before {
+                background: #ef4444;
+            }
+            .btn-quit::after {
+                background: #b91c1c;
+            }
+
+            .btn-collection::before {
+                background: #22c55e;
+            }
+            .btn-collection::after {
+                background: #15803d;
+            }
+
+            .profile-box {
+                position: relative;
+                padding: 16px 32px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .profile-box::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .profile-box::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #2d3748;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .profile-label {
+                font-family: "Balatro", monospace !important;
+                font-size: 16px;
+                color: #a0aec0;
+            }
+
+            .btn-profile {
+                position: relative;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 18px;
+                padding: 10px 20px;
+                border: none;
+                cursor: pointer;
+                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .btn-profile::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #3b82f6;
+                z-index: -1;
+                clip-path: polygon(
+                    0 4px,
+                    2px 4px,
+                    2px 2px,
+                    4px 2px,
+                    4px 0,
+                    calc(100% - 4px) 0,
+                    calc(100% - 4px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 4px,
+                    100% 4px,
+                    100% calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 4px) calc(100% - 2px),
+                    calc(100% - 4px) 100%,
+                    4px 100%,
+                    4px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 4px),
+                    0 calc(100% - 4px)
+                );
+            }
+
+            .btn-profile::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #1e40af;
+                z-index: -2;
+                clip-path: polygon(
+                    0 4px,
+                    2px 4px,
+                    2px 2px,
+                    4px 2px,
+                    4px 0,
+                    calc(100% - 4px) 0,
+                    calc(100% - 4px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 4px,
+                    100% 4px,
+                    100% calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 4px) calc(100% - 2px),
+                    calc(100% - 4px) 100%,
+                    4px 100%,
+                    4px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 4px),
+                    0 calc(100% - 4px)
+                );
+            }
+
+            .btn-profile:hover {
+                transform: translateY(-1px);
+            }
+            .btn-profile:active {
+                transform: translateY(1px);
+            }
+
+            .side-buttons {
+                position: fixed;
+                right: 30px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .social-buttons {
+                top: 50%;
+                transform: translateY(-80px);
+            }
+
+            .social-btn {
+                position: relative;
+                width: 65px;
+                height: 65px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.1s ease;
+            }
+
+            .social-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .social-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #2d3748;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .social-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .social-btn svg {
+                width: 32px;
+                height: 32px;
+                fill: white;
+                position: relative;
+                z-index: 1;
+            }
+
+            .lang-btn {
+                position: relative;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 16px;
+                padding: 14px 20px;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                transition: transform 0.1s ease;
+            }
+
+            .lang-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .lang-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #2d3748;
+                z-index: -2;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .lang-btn:hover {
+                transform: translateY(-2px);
+            }
+            .lang-btn svg,
+            .lang-btn span {
+                position: relative;
+                z-index: 1;
+            }
+
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+                opacity: 0;
+                animation: fadeIn 0.2s ease forwards;
+            }
+
+            @keyframes fadeIn {
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .modal-content {
+                position: relative;
+                padding: 20px;
+                min-width: 400px;
+                max-width: 90%;
+                animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)
+                    forwards;
+                transform: scale(0.8);
+            }
+
+            .modal-content::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a6670;
+                z-index: -1;
+                clip-path: polygon(
+                    0 10px,
+                    5px 10px,
+                    5px 5px,
+                    10px 5px,
+                    10px 0,
+                    calc(100% - 10px) 0,
+                    calc(100% - 10px) 5px,
+                    calc(100% - 5px) 5px,
+                    calc(100% - 5px) 10px,
+                    100% 10px,
+                    100% calc(100% - 10px),
+                    calc(100% - 5px) calc(100% - 10px),
+                    calc(100% - 5px) calc(100% - 5px),
+                    calc(100% - 10px) calc(100% - 5px),
+                    calc(100% - 10px) 100%,
+                    10px 100%,
+                    10px calc(100% - 5px),
+                    5px calc(100% - 5px),
+                    5px calc(100% - 10px),
+                    0 calc(100% - 10px)
+                );
+            }
+
+            @keyframes modalSlideIn {
+                to {
+                    transform: scale(1);
+                }
+            }
+
+            .about-menu {
+                min-width: 550px;
+            }
+
+            .about-header {
+                position: relative;
+                color: white;
+                text-align: center;
+                padding: 12px;
+                margin-bottom: 16px;
+                font-family: "Balatro", monospace !important;
+                font-size: 16px;
+            }
+
+            .about-header::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #3b82f6;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .about-content {
+                display: flex;
+                gap: 20px;
+            }
+            .about-left {
+                flex: 1;
+            }
+            .about-right {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 20px;
+            }
+
+            .stats-box {
+                position: relative;
+                padding: 16px;
+            }
+
+            .stats-box::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #2d3748;
+                border: 3px solid #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 8px,
+                    4px 8px,
+                    4px 4px,
+                    8px 4px,
+                    8px 0,
+                    calc(100% - 8px) 0,
+                    calc(100% - 8px) 4px,
+                    calc(100% - 4px) 4px,
+                    calc(100% - 4px) 8px,
+                    100% 8px,
+                    100% calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 4px),
+                    calc(100% - 8px) calc(100% - 4px),
+                    calc(100% - 8px) 100%,
+                    8px 100%,
+                    8px calc(100% - 4px),
+                    4px calc(100% - 4px),
+                    4px calc(100% - 8px),
+                    0 calc(100% - 8px)
+                );
+            }
+
+            .stat-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #4a5568;
+            }
+
+            .stat-title {
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 14px;
+            }
+            .stat-value {
+                color: #63b3ed;
+                font-family: "Balatro", monospace !important;
+                font-size: 14px;
+            }
+
+            .stat-row {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 12px;
+                margin-bottom: 8px;
+            }
+
+            .stat-row::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 4px,
+                    2px 4px,
+                    2px 2px,
+                    4px 2px,
+                    4px 0,
+                    calc(100% - 4px) 0,
+                    calc(100% - 4px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 4px,
+                    100% 4px,
+                    100% calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 4px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 4px) calc(100% - 2px),
+                    calc(100% - 4px) 100%,
+                    4px 100%,
+                    4px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 4px),
+                    0 calc(100% - 4px)
+                );
+            }
+
+            .stat-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .stat-label {
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 12px;
+            }
+            .stat-percent {
+                color: #63b3ed;
+                font-family: "Balatro", monospace !important;
+                font-size: 12px;
+            }
+
+            .projects-count {
+                color: #ef4444;
+                font-family: "Balatro", monospace !important;
+                font-size: 48px;
+                font-weight: bold;
+                text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+            }
+            .projects-label {
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 14px;
+            }
+
+            .projects-menu {
+                min-width: 100px;
+            }
+            .projects-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .project-card {
+                position: relative;
+                padding: 16px;
+            }
+
+            .project-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #2d3748;
+                border: 3px solid #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 8px,
+                    4px 8px,
+                    4px 4px,
+                    8px 4px,
+                    8px 0,
+                    calc(100% - 8px) 0,
+                    calc(100% - 8px) 4px,
+                    calc(100% - 4px) 4px,
+                    calc(100% - 4px) 8px,
+                    100% 8px,
+                    100% calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 8px),
+                    calc(100% - 4px) calc(100% - 4px),
+                    calc(100% - 8px) calc(100% - 4px),
+                    calc(100% - 8px) 100%,
+                    8px 100%,
+                    8px calc(100% - 4px),
+                    4px calc(100% - 4px),
+                    4px calc(100% - 8px),
+                    0 calc(100% - 8px)
+                );
+            }
+
+            .project-title {
+                position: relative;
+                font-family: "Balatro", monospace !important;
+                font-size: 18px;
+                text-align: center;
+                padding: 10px;
+                margin-bottom: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                display: block;
+            }
+
+            .project-title::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .project-title:hover {
+                transform: scale(1.02);
+            }
+            .project-title.true-vanilla {
+                color: #63b3ed;
+            }
+            .project-title.brandfinder {
+                color: #a78bfa;
+            }
+
+            .project-about-box {
+                position: relative;
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .project-about-box::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #1a202c;
+                border: 2px solid #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .project-about-title {
+                color: #ef4444;
+                font-family: "Balatro", monospace !important;
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            .project-about-text {
+                color: #a0aec0;
+                font-family: "Balatro", monospace !important;
+                font-size: 10px;
+                line-height: 1.6;
+            }
+
+            .project-btn {
+                position: relative;
+                width: 100%;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 12px;
+                padding: 10px;
+                border: none;
+                cursor: pointer;
+                transition: transform 0.1s ease;
+                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .project-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #ef4444;
+                z-index: -1;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .project-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #b91c1c;
+                z-index: -2;
+                clip-path: polygon(
+                    0 5px,
+                    2px 5px,
+                    2px 2px,
+                    5px 2px,
+                    5px 0,
+                    calc(100% - 5px) 0,
+                    calc(100% - 5px) 2px,
+                    calc(100% - 2px) 2px,
+                    calc(100% - 2px) 5px,
+                    100% 5px,
+                    100% calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 5px),
+                    calc(100% - 2px) calc(100% - 2px),
+                    calc(100% - 5px) calc(100% - 2px),
+                    calc(100% - 5px) 100%,
+                    5px 100%,
+                    5px calc(100% - 2px),
+                    2px calc(100% - 2px),
+                    2px calc(100% - 5px),
+                    0 calc(100% - 5px)
+                );
+            }
+
+            .project-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .social-menu {
+                min-width: 320px;
+            }
+
+            .social-link-btn {
+                position: relative;
+                width: 100%;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 14px;
+                padding: 14px;
+                border: none;
+                cursor: pointer;
+                margin-bottom: 10px;
+                transition: transform 0.1s ease;
+                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .social-link-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #ef4444;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .social-link-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -4px;
+                height: 100%;
+                background: #b91c1c;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .social-link-btn:hover {
+                transform: translateY(-2px);
+            }
+            .social-link-btn.disabled {
+                opacity: 0.7;
+                cursor: default;
+            }
+            .social-link-btn.disabled:hover {
+                transform: none;
+            }
+
+            .back-btn {
+                position: relative;
+                width: 100%;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 16px;
+                padding: 14px;
+                border: none;
+                cursor: pointer;
+                margin-top: 16px;
+                transition: transform 0.1s ease;
+                text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .back-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #f97316;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .back-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -4px;
+                height: 100%;
+                background: #c2410c;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .back-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .notification-badge {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                width: 22px;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-family: "Balatro", monospace !important;
+                color: white;
+                z-index: 5;
+            }
+
+            .notification-badge::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #ef4444;
+                border-radius: 50%;
+                z-index: -1;
+            }
+
+            .version-text {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                color: rgba(255, 255, 255, 0.5);
+                font-family: "Balatro", monospace !important;
+                font-size: 16px;
+            }
+
+            /* Splash Screen */
+            .splash-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #4a5568;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+
+            .splash-text {
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 24px;
+                margin-bottom: 30px;
+                text-align: center;
+                text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .splash-btn {
+                position: relative;
+                background: transparent;
+                color: white;
+                font-family: "Balatro", monospace !important;
+                font-size: 20px;
+                padding: 16px 40px;
+                border: none;
+                cursor: pointer;
+                text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+                transition: transform 0.1s ease;
+            }
+
+            .splash-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #3b82f6;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .splash-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -4px;
+                height: 100%;
+                background: #1e40af;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .splash-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .splash-btn:active {
+                transform: translateY(2px);
+            }
+
+            /* Sound Button */
+            .sound-btn {
+                position: fixed;
+                bottom: 50px;
+                left: 30px;
+                width: 65px;
+                height: 65px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.1s ease;
+                z-index: 50;
+            }
+
+            .sound-btn::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: #4a5568;
+                z-index: -1;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .sound-btn::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -3px;
+                height: 100%;
+                background: #2d3748;
+                z-index: -2;
+                clip-path: polygon(
+                    0 6px,
+                    3px 6px,
+                    3px 3px,
+                    6px 3px,
+                    6px 0,
+                    calc(100% - 6px) 0,
+                    calc(100% - 6px) 3px,
+                    calc(100% - 3px) 3px,
+                    calc(100% - 3px) 6px,
+                    100% 6px,
+                    100% calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 6px),
+                    calc(100% - 3px) calc(100% - 3px),
+                    calc(100% - 6px) calc(100% - 3px),
+                    calc(100% - 6px) 100%,
+                    6px 100%,
+                    6px calc(100% - 3px),
+                    3px calc(100% - 3px),
+                    3px calc(100% - 6px),
+                    0 calc(100% - 6px)
+                );
+            }
+
+            .sound-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .sound-btn img {
+                width: 32px;
+                height: 32px;
+                position: relative;
+                z-index: 1;
+                image-rendering: pixelated;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="balatro-bg"></canvas>
+        <audio id="balatro-sound" src="./balatro.wav" preload="auto"></audio>
+        <div id="root"></div>
+
+        <script>
+            (function () {
+                const canvas = document.getElementById("balatro-bg");
+                const gl =
+                    canvas.getContext("webgl") ||
+                    canvas.getContext("experimental-webgl");
+                if (!gl) {
+                    console.error("WebGL not supported");
+                    return;
+                }
+
+                function resize() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+                resize();
+                window.addEventListener("resize", resize);
+
+                const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+
+                const fragmentShaderSource = `
+                precision highp float;
+                uniform vec2 u_resolution;
+                uniform float u_time;
+                #define SPIN_ROTATION_SPEED 2.0
+                #define MOVE_SPEED 7.0
+                #define SPIN_EASE 1.0
+                #define CONTRAST 3.5
+                #define LIGHTING 0.4
+                #define SPIN_AMOUNT 0.25
+                #define PIXEL_FILTER 500.0
+                vec3 colour_1 = vec3(0.871, 0.267, 0.231);
+                vec3 colour_2 = vec3(0.0, 0.42, 0.706);
+                vec3 colour_3 = vec3(0.086, 0.137, 0.145);
+                void main() {
+                    float pixel_size = length(u_resolution.xy) / PIXEL_FILTER;
+                    vec2 uv = (floor(gl_FragCoord.xy * (1.0 / pixel_size)) * pixel_size - 0.5 * u_resolution.xy) / length(u_resolution.xy);
+                    float uv_len = length(uv);
+                    float speed = (SPIN_ROTATION_SPEED * SPIN_EASE * 0.2);
+                    speed += 302.2;
+                    float new_pixel_angle = atan(uv.y, uv.x) + speed - SPIN_EASE * 20.0 * (1.0 * SPIN_AMOUNT * uv_len + (1.0 - 1.0 * SPIN_AMOUNT));
+                    vec2 mid = (u_resolution.xy / length(u_resolution.xy)) / 2.0;
+                    uv = vec2((uv_len * cos(new_pixel_angle) + mid.x), (uv_len * sin(new_pixel_angle) + mid.y)) - mid;
+                    uv *= 30.0;
+                    float time_speed = u_time * MOVE_SPEED;
+                    vec2 uv2 = vec2(uv.x + uv.y);
+                    for(int i = 0; i < 5; i++) {
+                        uv2 += sin(max(uv.x, uv.y)) + uv;
+                        uv += 0.5 * vec2(cos(5.1123314 + 0.353 * uv2.y + time_speed * 0.131121), sin(uv2.x - 0.113 * time_speed));
+                        uv -= 1.0 * cos(uv.x + uv.y) - 1.0 * sin(uv.x * 0.711 - uv.y);
+                    }
+                    float contrast_mod = 0.25 * CONTRAST + 0.5 * SPIN_AMOUNT + 1.2;
+                    float paint_res = min(2.0, max(0.0, length(uv) * 0.035 * contrast_mod));
+                    float c1p = max(0.0, 1.0 - contrast_mod * abs(1.0 - paint_res));
+                    float c2p = max(0.0, 1.0 - contrast_mod * abs(paint_res));
+                    float c3p = 1.0 - min(1.0, c1p + c2p);
+                    float light = (LIGHTING - 0.2) * max(c1p * 5.0 - 4.0, 0.0) + LIGHTING * max(c2p * 5.0 - 4.0, 0.0);
+                    vec3 ret_col = (0.3 / CONTRAST) * colour_1 + (1.0 - 0.3 / CONTRAST) * (colour_1 * c1p + colour_2 * c2p + colour_3 * c3p) + light;
+                    gl_FragColor = vec4(ret_col, 1.0);
+                }
+            `;
+
+                function createShader(type, source) {
+                    const shader = gl.createShader(type);
+                    gl.shaderSource(shader, source);
+                    gl.compileShader(shader);
+                    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                        console.error(
+                            "Shader error:",
+                            gl.getShaderInfoLog(shader),
+                        );
+                        gl.deleteShader(shader);
+                        return null;
+                    }
+                    return shader;
+                }
+
+                const vertexShader = createShader(
+                    gl.VERTEX_SHADER,
+                    vertexShaderSource,
+                );
+                const fragmentShader = createShader(
+                    gl.FRAGMENT_SHADER,
+                    fragmentShaderSource,
+                );
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    console.error(
+                        "Program error:",
+                        gl.getProgramInfoLog(program),
+                    );
+                    return;
+                }
+
+                const positionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.bufferData(
+                    gl.ARRAY_BUFFER,
+                    new Float32Array([
+                        -1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1,
+                    ]),
+                    gl.STATIC_DRAW,
+                );
+
+                const positionLocation = gl.getAttribLocation(
+                    program,
+                    "a_position",
+                );
+                const resolutionLocation = gl.getUniformLocation(
+                    program,
+                    "u_resolution",
+                );
+                const timeLocation = gl.getUniformLocation(program, "u_time");
+
+                let startTime = Date.now();
+                function render() {
+                    gl.useProgram(program);
+                    gl.enableVertexAttribArray(positionLocation);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                    gl.vertexAttribPointer(
+                        positionLocation,
+                        2,
+                        gl.FLOAT,
+                        false,
+                        0,
+                        0,
+                    );
+                    gl.uniform2f(
+                        resolutionLocation,
+                        canvas.width,
+                        canvas.height,
+                    );
+                    gl.uniform1f(timeLocation, (Date.now() - startTime) / 1000);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    requestAnimationFrame(render);
+                }
+                render();
+            })();
+        </script>
+
+        <script type="text/babel">
+            const { useState, useEffect, useRef, useCallback } = React;
+
+            function AceCard() {
+                const cardRef = useRef(null);
+                const [isDragging, setIsDragging] = useState(false);
+                const [position, setPosition] = useState({ x: 0, y: 0 });
+                const [rotation, setRotation] = useState({ x: 0, y: 0 });
+                const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+                const [isHovering, setIsHovering] = useState(true);
+
+                const handleMouseDown = (e) => {
+                    setIsDragging(true);
+                    setIsHovering(false);
+                    setStartPos({
+                        x: e.clientX - position.x,
+                        y: e.clientY - position.y,
+                    });
+                };
+
+                const handleMouseMove = useCallback(
+                    (e) => {
+                        if (isDragging) {
+                            const newX = e.clientX - startPos.x;
+                            const newY = e.clientY - startPos.y;
+                            setPosition({ x: newX, y: newY });
+                            setRotation({
+                                x: Math.max(-30, Math.min(30, -newY * 0.2)),
+                                y: Math.max(-30, Math.min(30, newX * 0.2)),
+                            });
+                        } else if (cardRef.current) {
+                            const rect =
+                                cardRef.current.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2;
+                            const centerY = rect.top + rect.height / 2;
+                            setRotation({
+                                x: -(e.clientY - centerY) * 0.05,
+                                y: (e.clientX - centerX) * 0.05,
+                            });
+                        }
+                    },
+                    [isDragging, startPos],
+                );
+
+                const handleMouseUp = () => {
+                    if (isDragging) {
+                        setIsDragging(false);
+                        setPosition({ x: 0, y: 0 });
+                        setRotation({ x: 0, y: 0 });
+                        setTimeout(() => setIsHovering(true), 300);
+                    }
+                };
+
+                useEffect(() => {
+                    document.addEventListener("mousemove", handleMouseMove);
+                    document.addEventListener("mouseup", handleMouseUp);
+                    return () => {
+                        document.removeEventListener(
+                            "mousemove",
+                            handleMouseMove,
+                        );
+                        document.removeEventListener("mouseup", handleMouseUp);
+                    };
+                }, [handleMouseMove]);
+
+                return (
+                    <img
+                        ref={cardRef}
+                        src="./ace.png"
+                        alt="Ace"
+                        className={`ace-card ${isHovering && !isDragging ? "hovering" : ""}`}
+                        style={{
+                            transform: `translate(${position.x}px, ${position.y}px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) ${isDragging ? "scale(1.1)" : "scale(1)"}`,
+                            transition: isDragging
+                                ? "none"
+                                : "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            boxShadow: isDragging
+                                ? "0 20px 40px rgba(0,0,0,0.4)"
+                                : "0 5px 15px rgba(0,0,0,0.3)",
+                        }}
+                        onMouseDown={handleMouseDown}
+                        onMouseLeave={() =>
+                            !isDragging && setRotation({ x: 0, y: 0 })
+                        }
+                        draggable={false}
+                    />
+                );
+            }
+
+            function MenuButton({ children, className, onClick, badge }) {
+                return (
+                    <button
+                        className={`pixel-btn ${className}`}
+                        onClick={onClick}
+                    >
+                        <span style={{ position: "relative", zIndex: 1 }}>
+                            {children}
+                        </span>
+                        {badge && <span className="notification-badge">!</span>}
+                    </button>
+                );
+            }
+
+            function AboutMenu({ onClose }) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div
+                            className="modal-content about-menu"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="about-header">AZ_TTV</div>
+                            <div className="about-content">
+                                <div className="about-left">
+                                    <div className="stats-box">
+                                        <div className="stat-header">
+                                            <span className="stat-title">
+                                                Niveau
+                                            </span>
+                                            <span className="stat-value">
+                                                4%
+                                            </span>
+                                        </div>
+                                        <div className="stat-row">
+                                            <span className="stat-label">
+                                                Développement
+                                            </span>
+                                            <span className="stat-percent">
+                                                16%
+                                            </span>
+                                        </div>
+                                        <div className="stat-row">
+                                            <span className="stat-label">
+                                                Réseau
+                                            </span>
+                                            <span className="stat-percent">
+                                                0%
+                                            </span>
+                                        </div>
+                                        <div className="stat-row">
+                                            <span className="stat-label">
+                                                Montage Vidéo
+                                            </span>
+                                            <span className="stat-percent">
+                                                1%
+                                            </span>
+                                        </div>
+                                        <div className="stat-row">
+                                            <span className="stat-label">
+                                                Montage Photo
+                                            </span>
+                                            <span className="stat-percent">
+                                                1%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="about-right">
+                                    <span className="projects-label">
+                                        Projets:
+                                    </span>
+                                    <span className="projects-count">2</span>
+                                </div>
+                            </div>
+                            <button className="back-btn" onClick={onClose}>
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            function ProjectsMenu({ onClose }) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div
+                            className="modal-content projects-menu"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="projects-grid">
+                                <div className="project-card">
+                                    <a
+                                        href="https://www.true-vanilla.fr/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="project-title true-vanilla"
+                                    >
+                                        True Vanilla
+                                    </a>
+                                    <div className="project-about-box">
+                                        <div className="project-about-title">
+                                            À Propos
+                                        </div>
+                                        <div className="project-about-text">
+                                            True Vanilla est un serveur
+                                            Minecraft SMP français vanilla,
+                                            conçu pour les joueurs âgés de 14 à
+                                            16 ans. Le serveur offre une
+                                            expérience de jeu authentique sans
+                                            mods, favorisant la communauté et la
+                                            créativité dans un environnement sûr
+                                            et convivial.
+                                        </div>
+                                    </div>
+                                    <button
+                                        className="project-btn"
+                                        onClick={() =>
+                                            window.open(
+                                                "https://www.true-vanilla.fr/",
+                                                "_blank",
+                                            )
+                                        }
+                                    >
+                                        Plus d'infos
+                                    </button>
+                                </div>
+                                <div className="project-card">
+                                    <a
+                                        href="https://www.brandfinder.fr/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="project-title brandfinder"
+                                    >
+                                        BrandFinder
+                                    </a>
+                                    <div className="project-about-box">
+                                        <div className="project-about-title">
+                                            À Propos
+                                        </div>
+                                        <div className="project-about-text">
+                                            BrandFinder est une plateforme
+                                            innovante qui aide les entreprises à
+                                            trouver et vérifier la disponibilité
+                                            des noms de marque. L'outil permet
+                                            de rechercher rapidement si un nom
+                                            est disponible pour le dépôt de
+                                            marque et les domaines web associés.
+                                        </div>
+                                    </div>
+                                    <button
+                                        className="project-btn"
+                                        onClick={() =>
+                                            window.open(
+                                                "https://www.brandfinder.fr/",
+                                                "_blank",
+                                            )
+                                        }
+                                    >
+                                        Plus d'infos
+                                    </button>
+                                </div>
+                            </div>
+                            <button className="back-btn" onClick={onClose}>
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            function SocialMenu({ onClose }) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div
+                            className="modal-content social-menu"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className="social-link-btn disabled">
+                                Discord : @az_ttv
+                            </button>
+                            <button
+                                className="social-link-btn"
+                                onClick={() =>
+                                    window.open(
+                                        "https://www.youtube.com/@truevanillafr",
+                                        "_blank",
+                                    )
+                                }
+                            >
+                                Youtube : @truevanillafr
+                            </button>
+                            <button
+                                className="social-link-btn"
+                                onClick={() =>
+                                    window.open(
+                                        "https://www.tiktok.com/@truevanillafr",
+                                        "_blank",
+                                    )
+                                }
+                            >
+                                Tiktok : @truevanillafr
+                            </button>
+                            <button
+                                className="social-link-btn"
+                                onClick={() =>
+                                    window.open(
+                                        "https://www.twitch.tv/amdewen",
+                                        "_blank",
+                                    )
+                                }
+                            >
+                                Twitch : @amdewen
+                            </button>
+                            <button className="back-btn" onClick={onClose}>
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            function InstagramIcon() {
+                return (
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                    </svg>
+                );
+            }
+
+            function GitHubIcon() {
+                return (
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                );
+            }
+
+            function GlobeIcon() {
+                return (
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="white"
+                    >
+                        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm7.931 9h-2.764a14.67 14.67 0 0 0-1.792-6.243A8.013 8.013 0 0 1 19.931 11zM12.53 4.027c1.035 1.364 2.427 3.78 2.627 6.973H9.03c.139-2.596.994-5.028 2.451-6.974.172-.01.344-.026.519-.026.179 0 .354.016.53.027zm-3.842.747A14.67 14.67 0 0 0 6.896 11H4.069a8.013 8.013 0 0 1 4.619-6.226zM4.069 13h2.974a14.67 14.67 0 0 0 1.792 6.243A8.013 8.013 0 0 1 4.069 13zm8.461 6.973c-1.035-1.364-2.427-3.78-2.627-6.973h5.127c-.139 2.596-.994 5.028-2.451 6.974-.172.01-.344.026-.519.026-.179 0-.354-.016-.53-.027zm3.842-.747A14.67 14.67 0 0 0 17.104 13h2.827a8.013 8.013 0 0 1-4.619 6.226z" />
+                    </svg>
+                );
+            }
+
+            function App() {
+                const [showAbout, setShowAbout] = useState(false);
+                const [showProjects, setShowProjects] = useState(false);
+                const [showSocial, setShowSocial] = useState(false);
+                const [menuVisible, setMenuVisible] = useState(false);
+                const [showSplash, setShowSplash] = useState(true);
+                const [isMuted, setIsMuted] = useState(false);
+
+                const enterSite = () => {
+                    setShowSplash(false);
+                    setTimeout(() => setMenuVisible(true), 300);
+
+                    // Play sound when entering
+                    const audio = document.getElementById("balatro-sound");
+                    if (audio) {
+                        audio.volume = 0.5;
+                        audio.loop = true;
+                        audio
+                            .play()
+                            .catch((e) => console.log("Audio play failed:", e));
+                    }
+                };
+
+                const toggleSound = () => {
+                    const audio = document.getElementById("balatro-sound");
+                    if (audio) {
+                        if (isMuted) {
+                            audio.muted = false;
+                            audio
+                                .play()
+                                .catch((e) =>
+                                    console.log("Audio play failed:", e),
+                                );
+                        } else {
+                            audio.muted = true;
+                        }
+                        setIsMuted(!isMuted);
+                    }
+                };
+
+                if (showSplash) {
+                    return (
+                        <div className="splash-screen">
+                            <div className="splash-text">
+                                Cette page web contient une musique de fond
+                            </div>
+                            <button className="splash-btn" onClick={enterSite}>
+                                Compris !
+                            </button>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="app-container">
+                        <span className="version-text">1.0.1o-FULL</span>
+                        <div className="logo-container">
+                            <img
+                                src="./mainlogo.png"
+                                alt="Logo"
+                                className="main-logo"
+                            />
+                            <AceCard />
+                        </div>
+                        <div
+                            className="menu-container"
+                            style={{
+                                opacity: menuVisible ? 1 : 0,
+                                transform: `translateX(-50%) ${menuVisible ? "translateY(0) scale(1)" : "translateY(20px) scale(0.9)"}`,
+                                transition:
+                                    "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            }}
+                        >
+                            <div className="profile-box">
+                                <span className="profile-label">Profile</span>
+                                <button
+                                    className="btn-profile"
+                                    onClick={() => setShowAbout(true)}
+                                >
+                                    À PROPOS
+                                </button>
+                            </div>
+                            <div className="buttons-background">
+                                <MenuButton className="btn-play">
+                                    PLAY
+                                </MenuButton>
+                                <MenuButton className="btn-options">
+                                    CONTACTS
+                                </MenuButton>
+                                <MenuButton
+                                    className="btn-quit"
+                                    onClick={() =>
+                                        (window.location.href =
+                                            "https://www.google.com")
+                                    }
+                                >
+                                    QUIT
+                                </MenuButton>
+                                <MenuButton
+                                    className="btn-collection"
+                                    onClick={() => setShowProjects(true)}
+                                    badge={true}
+                                >
+                                    PROJETS
+                                </MenuButton>
+                            </div>
+                        </div>
+                        <div
+                            className="side-buttons social-buttons"
+                            style={{
+                                opacity: menuVisible ? 1 : 0,
+                                transform: menuVisible
+                                    ? "translateY(-80px)"
+                                    : "translateY(-80px) translateX(20px)",
+                                transition:
+                                    "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s",
+                            }}
+                        >
+                            <button
+                                className="social-btn"
+                                onClick={() =>
+                                    window.open(
+                                        "https://www.instagram.com/amdewen/",
+                                        "_blank",
+                                    )
+                                }
+                            >
+                                <InstagramIcon />
+                            </button>
+                            <button
+                                className="social-btn"
+                                onClick={() =>
+                                    window.open(
+                                        "https://github.com/azttv",
+                                        "_blank",
+                                    )
+                                }
+                            >
+                                <GitHubIcon />
+                            </button>
+                        </div>
+                        <div
+                            className="side-buttons"
+                            style={{
+                                position: "fixed",
+                                right: "30px",
+                                bottom: "50px",
+                                opacity: menuVisible ? 1 : 0,
+                                transform: menuVisible
+                                    ? "translateX(0)"
+                                    : "translateX(20px)",
+                                transition:
+                                    "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s",
+                            }}
+                        >
+                            <button
+                                className="lang-btn"
+                                onClick={() => setShowSocial(true)}
+                            >
+                                <GlobeIcon />
+                                <span>Autres</span>
+                            </button>
+                        </div>
+                        {showAbout && (
+                            <AboutMenu onClose={() => setShowAbout(false)} />
+                        )}
+                        {showProjects && (
+                            <ProjectsMenu
+                                onClose={() => setShowProjects(false)}
+                            />
+                        )}
+                        {showSocial && (
+                            <SocialMenu onClose={() => setShowSocial(false)} />
+                        )}
+
+                        {/* Sound Toggle Button */}
+                        <button
+                            className="sound-btn"
+                            onClick={toggleSound}
+                            style={{
+                                opacity: menuVisible ? 1 : 0,
+                                transform: menuVisible
+                                    ? "translateX(0)"
+                                    : "translateX(-20px)",
+                                transition:
+                                    "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s",
+                            }}
+                        >
+                            <img
+                                src={isMuted ? "./nosound.png" : "./sound.png"}
+                                alt={isMuted ? "Unmute" : "Mute"}
+                            />
+                        </button>
+                    </div>
+                );
+            }
+
+            ReactDOM.render(<App />, document.getElementById("root"));
+        </script>
+    </body>
+</html>
