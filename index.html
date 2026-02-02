@@ -2113,7 +2113,7 @@
                                 <MenuButton className="btn-play">
                                     PLAY
                                 </MenuButton>
-                                <MenuButton className="btn-options">
+                                <MenuButton className="btn-options" onClick={() => setShowSocial(true)}>
                                     CONTACTS
                                 </MenuButton>
                                 <MenuButton
@@ -2166,28 +2166,6 @@
                                 }
                             >
                                 <GitHubIcon />
-                            </button>
-                        </div>
-                        <div
-                            className="side-buttons"
-                            style={{
-                                position: "fixed",
-                                right: "30px",
-                                bottom: "50px",
-                                opacity: menuVisible ? 1 : 0,
-                                transform: menuVisible
-                                    ? "translateX(0)"
-                                    : "translateX(20px)",
-                                transition:
-                                    "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s",
-                            }}
-                        >
-                            <button
-                                className="lang-btn"
-                                onClick={() => setShowSocial(true)}
-                            >
-                                <GlobeIcon />
-                                <span>Autres</span>
                             </button>
                         </div>
                         {showAbout && (
